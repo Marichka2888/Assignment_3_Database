@@ -1,24 +1,21 @@
 CREATE TABLE mart.dim_date AS
-WITH dates AS (
-  SELECT DATE_ADD(DATE '2020-01-01', INTERVAL x DAY) AS the_date
-  FROM UNNEST(GENERATE_ARRAY(0, 365)) AS x
-)
 SELECT
-  the_date,
-  EXTRACT(DAYOFWEEK FROM the_date) AS dow,
-  EXTRACT(MONTH FROM the_date) AS month,
-  EXTRACT(YEAR FROM the_date) AS year
-FROM dates;
+  d AS the_date,
+  EXTRACT(DAYOFWEEK FROM d) AS dow,
+  EXTRACT(MONTH FROM d) AS month,
+  EXTRACT(YEAR FROM d) AS year
+FROM UNNEST(GENERATE_DATE_ARRAY('2020-01-01', '2020-12-31')) AS d;
+
 
 CREATE TABLE mart.dim_customer AS
 SELECT
-    row_number() OVER (ORDER BY user_id) AS customer_sk,
+    ROW_NUMBER() OVER (ORDER BY user_id) AS customer_sk,
     user_id,
     MIN(order_number) AS first_order_number,
     MAX(order_number) AS last_order_number,
     COUNT(*) AS total_orders,
     TRUE AS current_flag
-FROM stage.stage_orders
+FROM stage.order_lines_enriched
 GROUP BY user_id;
 
 
@@ -34,4 +31,3 @@ SELECT
     TRUE AS current_flag,
     1 AS version
 FROM stage.stage_products;
-
