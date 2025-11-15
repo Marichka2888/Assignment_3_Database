@@ -9,6 +9,7 @@ SELECT
   EXTRACT(MONTH FROM the_date) AS month,
   EXTRACT(YEAR FROM the_date) AS year
 FROM dates;
+
 CREATE TABLE mart.dim_customer AS
 SELECT
     row_number() OVER (ORDER BY user_id) AS customer_sk,
@@ -33,3 +34,4 @@ SELECT
     TRUE AS current_flag,
     1 AS version
 FROM stage.stage_products;
+
